@@ -65,18 +65,6 @@
   retries: 10
   delay: 6
   
-  - name: Create Quay Operator NS, Homeroom NS, rolebinding, and secret
-  k8s:
-    state: present
-    definition: "{{ lookup('template', item ) | from_yaml }}"
-  loop:
-    - quay-ns.yml
-    - homeroom-ns.yml
-    - rolebinding.yml
-    - operatorgroup.yml
-    - subscription.yml
-    - secret.yml
-
 - name: Create the homeroom template
   command: oc apply -f https://raw.githubusercontent.com/afouladi7/quay-workshop/master/templates/hosted-workshop-production.json -n homeroom
 
