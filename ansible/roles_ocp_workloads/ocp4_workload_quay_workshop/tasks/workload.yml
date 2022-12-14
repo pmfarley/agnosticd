@@ -11,7 +11,61 @@
   set_fact:
     CLUSTER_SUBDOMAIN: "{{ r_ingress_config.resources[0].spec.domain }}"
 
-- name: Create Quay Operator NS, Homeroom NS, rolebinding, and secret
+- name: Create Quay namespace/project 
+  kubernetes.core.k8s:
+    state: present
+    template: quay-ns.yml
+  register: result
+  until: result is not failed
+  retries: 10
+  delay: 6
+
+- name: Create Homeroom namespace/project 
+  kubernetes.core.k8s:
+    state: present
+    template: homeroom-ns.yml
+  register: result
+  until: result is not failed
+  retries: 10
+  delay: 6
+ 
+  - name: Create cluster role binding
+    kubernetes.core.k8s:
+      state: present
+      template: rolebinding.yml
+    register: result
+    until: result is not failed
+    retries: 10
+    delay: 6
+  
+- name: Create operatorgroup
+  kubernetes.core.k8s:
+    state: present
+    template: operatorgroup.yml
+  register: result
+  until: result is not failed
+  retries: 10
+  delay: 6
+
+- name: Create subscription
+  kubernetes.core.k8s:
+    state: present
+    template: subscription.yml
+  register: result
+  until: result is not failed
+  retries: 10
+  delay: 6
+  
+- name: Create pull secret
+  kubernetes.core.k8s:
+    state: present
+    template: secret.yml
+  register: result
+  until: result is not failed
+  retries: 10
+  delay: 6
+  
+  - name: Create Quay Operator NS, Homeroom NS, rolebinding, and secret
   k8s:
     state: present
     definition: "{{ lookup('template', item ) | from_yaml }}"
